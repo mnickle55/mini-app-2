@@ -5,7 +5,7 @@ const Square = ({handleClick,state}) => {
   if(state.wasClicked === true) {
     if(state.isBomb === true){
       return ( 
-        <Button onClick={()=>handleClick(state.num)} className="square-clicked">💣</Button>
+        <Button onClick={()=>handleClick(state.num)} className="square-clicked-bomb">💣</Button>
     );
     } else {
         return ( 

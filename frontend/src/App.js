@@ -1,23 +1,36 @@
 import './App.css';
 import Board from './Board';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
 
   const [matrix,setMatrix] = useState(null)
   const [gameLost,setGameLost] = useState(false)
+  const [reset,setReset] = useState(0)
+  const [size,setSize] = useState(10)
+
+  // [[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24]]
+
+  const handleResize = (number) => {
+    setSize(number)
+  }
 
   const handleClick = (index) => {
+    console.log(index)
+    if(index==='reset'){
+      setReset(reset+1)
+      return
+    }
     // if(gameLost) return;
     let newMatrix = JSON.parse(JSON.stringify(matrix))
-    if(index<10){
+    if(Math.floor(index/size)===0){
       if(newMatrix[0][index].isBomb===true){
         setGameLost(true)
       }
       newMatrix[0][index].wasClicked = true
     } else {
-      let row = parseInt(index.toString().slice(0,1))
-      let ind = parseInt(index.toString().slice(1,2))
+      let row = Math.floor(index/size)
+      let ind = index % size
       if(newMatrix[row][ind].isBomb===true){
         setGameLost(true)
       }
@@ -29,42 +42,42 @@ function App() {
   
   //setup matrix for board
   useEffect(()=> {
+    setGameLost(false)
     let array = []
-    for(let i=0;i<10;i++){
+    for(let i=0;i<size;i++){
       let innerArray = [];
-      for(let j=0;j<10;j++){
-        innerArray.push({num:parseInt(`${i}${j}`) ,wasClicked: false,isBomb:false,adjacentBombCount:0})
+      for(let j=0;j<size;j++){
+        innerArray.push({num:(i*size+j) ,wasClicked: false,isBomb:false,adjacentBombCount:0})
       }
       array.push(innerArray)
     }
-    for (let i=0;i<10;i++){
-      let randomRow = Math.floor(Math.random() * 10);
-      let randomCol = Math.floor(Math.random() * 10);
+    for (let i=0;i<size;i++){
+      let randomRow = Math.floor(Math.random() * size);
+      let randomCol = Math.floor(Math.random() * size);
       array[randomRow][randomCol].isBomb = true
     }
 
-    for (let i=0;i<10;i++){
-      for (let j=0;j<10;j++){
+    for (let i=0;i<size;i++){
+      for (let j=0;j<size;j++){
         if(array[i][j].isBomb){
           let num = array[i][j].num
-          console.log('bombs at: ',num)
-          for (let k=0;k<10;k++){
-            for (let z=0;z<10;z++){
+          for (let k=0;k<size;k++){
+            for (let z=0;z<size;z++){
               //left side of board
-              if(array[k][z].num % 10 === 0){
-                if(array[k][z].num+1===num || array[k][z].num+10===num || array[k][z].num+11===num || array[k][z].num-10===num || array[k][z].num-9===num) {
+              if(array[k][z].num % size === 0){
+                if(array[k][z].num+1===num || array[k][z].num+size===num || array[k][z].num+size+1===num || array[k][z].num-size===num || array[k][z].num-size+1===num) {
                   array[k][z].adjacentBombCount ++;
                 }
               }
               //right side of board
-              else if(array[k][z].num % 10 === 9){
-                if(array[k][z].num-1===num || array[k][z].num+10===num  ||array[k][z].num+9===num  || array[k][z].num-10===num  || array[k][z].num-11===num  ) {
+              else if(array[k][z].num % size === size-1){
+                if(array[k][z].num-1===num || array[k][z].num+size===num  ||array[k][z].num+size-1===num  || array[k][z].num-size===num  || array[k][z].num-size-1===num  ) {
                   array[k][z].adjacentBombCount ++;
                 }
               }
               //all others
               else {
-                if(array[k][z].num-1===num  || array[k][z].num+10===num  ||array[k][z].num+9===num  || array[k][z].num-10===num  || array[k][z].num-11===num  || array[k][z].num+1===num  || array[k][z].num+11===num  || array[k][z].num-9===num  ) {
+                if(array[k][z].num-1===num  || array[k][z].num+size===num  ||array[k][z].num+size-1===num  || array[k][z].num-size===num  || array[k][z].num-size+1===num  || array[k][z].num+1===num  || array[k][z].num+size+1===num  || array[k][z].num-size-1===num  ) {
                   array[k][z].adjacentBombCount ++;
                 }
               }
@@ -74,13 +87,13 @@ function App() {
       }
     }
     setMatrix(array)
-  },[])
+  },[reset,size])
 
 
   if(matrix) {
     return (
       <div className="App">
-        <Board gameLost={gameLost} handleClick={handleClick} matrix={matrix}/>
+        <Board gameLost={gameLost} handleResize={handleResize} handleClick={handleClick} matrix={matrix}/>
       </div>
     );
   }
