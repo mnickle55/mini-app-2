@@ -1,4 +1,5 @@
 import Square from "./Square";
+import Timer from "./Timer";
 import { Container,Row,Col, Button,ButtonGroup } from "react-bootstrap";
 
 const Board = ({matrix,handleClick,gameLost,handleResize}) => {
@@ -53,6 +54,8 @@ const Board = ({matrix,handleClick,gameLost,handleResize}) => {
       </Col>
     </Row>
       </> }
+      <Timer />
+      
       {matrix.map((row,index) => 
         <Row key={index}>
           {row.map((cell,ind) => {
